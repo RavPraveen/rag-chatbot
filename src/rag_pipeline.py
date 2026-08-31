@@ -23,17 +23,17 @@ class RAGPipeline:
         filename: str
     ) -> int:
 
-        text = load_document(
+        pages = load_document(
             file_bytes,
             filename
         )
 
-        if not text.strip():
+        if not pages:
             raise ValueError(
                 "The uploaded document contains no readable text."
             )
 
-        chunks = split_text(text)
+        chunks = split_text(pages)
 
         if not chunks:
             raise ValueError(

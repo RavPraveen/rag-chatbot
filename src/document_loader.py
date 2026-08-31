@@ -1,9 +1,9 @@
 import fitz
 
 #Extract the text from the pdf file given the parameters the text is extracted
-def load_pdf(file_bytes: bytes) -> str:
+def load_pdf(file_bytes: bytes) -> list[tuple[int, str]]:
     """
-    Extract text from a PDF file.
+    Extract text from a PDF file and keep the page number for each page.
 
     Parameters
     ----------
@@ -12,33 +12,35 @@ def load_pdf(file_bytes: bytes) -> str:
 
     Returns
     -------
-    str
-        Extracted text.
+    list[tuple[int, str]]
+        A list of (page_number, page_text) tuples.
     """
 
     document = fitz.open(stream=file_bytes, filetype="pdf")
 
     pages = []
 
-    for page in document:
+    for page_number, page in enumerate(document, start=1):
         text = page.get_text()
         if text.strip():
-            pages.append(text)
+            pages.append((page_number, text))
 
     document.close()
-    #join each page with a double line breaker and return   
-    return "\n\n".join(pages)
+    return pages
 
 
-def load_text(file_bytes: bytes) -> str:
+def load_text(file_bytes: bytes) -> list[tuple[int, str]]:
     """
-    Decode a plain text file.
+    Decode a plain text file as page 1.
     """
 
-    return file_bytes.decode("utf-8", errors="ignore")
+    text = file_bytes.decode("utf-8", errors="ignore")
+    if not text.strip():
+        return []
+    return [(1, text)]
 
 
-def load_document(file_bytes: bytes, filename: str) -> str:
+def load_document(file_bytes: bytes, filename: str) -> list[tuple[int, str]]:
     """
     Load a supported document based on its extension.
     """
