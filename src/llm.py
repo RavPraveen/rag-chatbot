@@ -37,6 +37,8 @@ If the answer cannot be found in the context, say:
 
 Do not invent information.
 
+When you reference a fact from the document, include the page number from the chunk label in your answer, such as "Page 4".
+
 Document context:
 
 {context_text}

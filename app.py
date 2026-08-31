@@ -1,3 +1,5 @@
+import re
+
 import streamlit as st
 from dotenv import load_dotenv
 
@@ -146,10 +148,22 @@ else:
                             start=1
                         ):
 
+                            match = re.search(
+                                r"\[Page\s+(\d+)\]",
+                                source
+                            )
+                            page_number = (
+                                match.group(1)
+                                if match
+                                else "Unknown"
+                            )
+
                             st.markdown(
                                 f"**Source {i}**"
                             )
-
+                            st.caption(
+                                f"Page {page_number}"
+                            )
                             st.write(source)
 
                 except Exception as error:
