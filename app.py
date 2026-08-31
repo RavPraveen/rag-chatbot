@@ -1,5 +1,3 @@
-import re
-
 import streamlit as st
 from dotenv import load_dotenv
 
@@ -24,28 +22,27 @@ def create_pipeline():
 pipeline = create_pipeline()
 
 
-# --------------------------------------------------
-# Header
-# --------------------------------------------------
+# ---------------------------------------------
+# Session state
+# ---------------------------------------------
 
-st.title("📚 Document Q&A Assistant")
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-st.write(
-    "Upload a PDF or text document and ask questions "
-    "about its content."
-)
+if "document_processed" not in st.session_state:
+    st.session_state.document_processed = False
 
 
-# --------------------------------------------------
+# ---------------------------------------------
 # Sidebar
-# --------------------------------------------------
+# ---------------------------------------------
 
 with st.sidebar:
 
-    st.header("Document")
+    st.header("📄 Document")
 
     uploaded_file = st.file_uploader(
-        "Upload a document",
+        "Upload PDF or TXT",
         type=["pdf", "txt"]
     )
 
@@ -60,16 +57,18 @@ with st.sidebar:
 
                 try:
 
-                    number_of_chunks = (
-                        pipeline.ingest_document(
-                            uploaded_file.getvalue(),
-                            uploaded_file.name
-                        )
+                    number_of_chunks = pipeline.ingest_document(
+                        uploaded_file.getvalue(),
+                        uploaded_file.name
                     )
 
                     st.session_state.document_processed = True
                     st.session_state.document_name = uploaded_file.name
                     st.session_state.chunk_count = number_of_chunks
+
+                    # Clear old conversation when a new document
+                    # is uploaded
+                    st.session_state.messages = []
 
                     st.success(
                         f"Processed {number_of_chunks} chunks."
@@ -80,94 +79,157 @@ with st.sidebar:
                     st.error(str(error))
 
 
-    if st.session_state.get("document_processed"):
+# ---------------------------------------------
+# Main interface
+# ---------------------------------------------
 
-        st.divider()
+st.title("📚 Document Q&A Assistant")
 
-        st.success(
-            f"Loaded: {st.session_state.document_name}"
-        )
-
-        st.caption(
-            f"Document chunks: "
-            f"{st.session_state.chunk_count}"
-        )
+st.caption(
+    "Ask questions about your uploaded document."
+)
 
 
-# --------------------------------------------------
-# Question input
-# --------------------------------------------------
-
-if not st.session_state.get("document_processed"):
+if not st.session_state.document_processed:
 
     st.info(
-        "Upload a document and click "
-        "'Process Document' to begin."
+        "Upload a document and process it to start chatting."
     )
 
 else:
 
-    st.subheader("Ask a question")
+    # -----------------------------------------
+    # Display previous messages
+    # -----------------------------------------
 
-    question = st.text_input(
-        "Question",
-        placeholder="Ask something about the document..."
+    for message in st.session_state.messages:
+
+        with st.chat_message(message["role"]):
+
+            st.markdown(message["content"])
+
+            # Show retrieved chunks for assistant messages
+            if message["role"] == "assistant":
+
+                chunks = message.get("chunks", [])
+
+                with st.expander(
+                    "🔍 View retrieved context"
+                ):
+
+                    if chunks:
+
+                        for i, chunk in enumerate(
+                            chunks,
+                            start=1
+                        ):
+
+                            st.markdown(
+                                f"**Chunk {i}**"
+                            )
+
+                            st.write(chunk)
+
+                            if i < len(chunks):
+                                st.divider()
+
+                    else:
+
+                        st.write(
+                            "No relevant chunks were retrieved."
+                        )
+
+
+    # -----------------------------------------
+    # New question
+    # -----------------------------------------
+
+    question = st.chat_input(
+        "Ask a question..."
     )
 
-    if st.button(
-        "Get Answer",
-        type="primary"
-    ):
 
-        if not question.strip():
+    if question:
 
-            st.warning("Please enter a question.")
+        # -----------------------------------------
+        # User message
+        # -----------------------------------------
 
-        else:
+        st.session_state.messages.append({
+            "role": "user",
+            "content": question
+        })
+
+        with st.chat_message("user"):
+
+            st.markdown(question)
+
+
+        # -----------------------------------------
+        # Generate answer
+        # -----------------------------------------
+
+        with st.chat_message("assistant"):
 
             with st.spinner("Searching document..."):
 
                 try:
 
-                    answer, sources = (
-                        pipeline.answer_question(
-                            question
-                        )
+                    answer, chunks = pipeline.answer_question(
+                        question
                     )
 
-                    st.subheader("Answer")
+                    st.markdown(answer)
 
-                    st.write(answer)
+                    # ---------------------------------
+                    # Retrieved context
+                    # ---------------------------------
 
                     with st.expander(
-                        "View retrieved context"
+                        "🔍 View retrieved context"
                     ):
 
-                        for i, source in enumerate(
-                            sources,
-                            start=1
-                        ):
+                        if chunks:
 
-                            match = re.search(
-                                r"\[Page\s+(\d+)\]",
-                                source
-                            )
-                            page_number = (
-                                match.group(1)
-                                if match
-                                else "Unknown"
+                            for i, chunk in enumerate(
+                                chunks,
+                                start=1
+                            ):
+
+                                st.markdown(
+                                    f"**Chunk {i}**"
+                                )
+
+                                st.write(chunk)
+
+                                if i < len(chunks):
+                                    st.divider()
+
+                        else:
+
+                            st.write(
+                                "No relevant chunks were retrieved."
                             )
 
-                            st.markdown(
-                                f"**Source {i}**"
-                            )
-                            st.caption(
-                                f"Page {page_number}"
-                            )
-                            st.write(source)
 
                 except Exception as error:
 
-                    st.error(
-                        f"Unable to generate answer: {error}"
+                    answer = (
+                        "Sorry, I couldn't process "
+                        "your question."
                     )
+
+                    chunks = []
+
+                    st.error(str(error))
+
+
+        # -----------------------------------------
+        # Store assistant response + chunks
+        # -----------------------------------------
+
+        st.session_state.messages.append({
+            "role": "assistant",
+            "content": answer,
+            "chunks": chunks
+        })
