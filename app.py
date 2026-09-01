@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 from dotenv import load_dotenv
 
 from src.rag_pipeline import RAGPipeline
@@ -61,9 +62,39 @@ st.markdown("""
     }
 
     /* ===== Main Container ===== */
+    .main {
+        overflow: hidden !important;
+    }
     .main .block-container {
-        padding: 2rem 2.5rem 3rem 2.5rem;
-        max-width: 960px;
+        padding: 0 !important;
+        max-width: 100% !important;
+        height: calc(100vh - 150px);
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* Hero container takes fixed space */
+    .main .block-container > .element-container:first-child {
+        flex-shrink: 0;
+    }
+    
+    /* Main content below hero */
+    .main .block-container > .element-container:nth-child(2) {
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+        padding: 1.5rem 2.5rem !important;
+    }
+
+    /* Keep the columns fixed. The document viewer and chat area
+       manage their own scrolling independently. */
+    [data-testid="stColumn"] {
+        overflow: hidden !important;
+    }
+
+    /* Fixed-height Streamlit containers can scroll internally. */
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        min-height: 0;
     }
 
     /* ===== Scrollbar ===== */
@@ -71,6 +102,14 @@ st.markdown("""
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+    
+    /* Disable main page scrolling */
+    html, body {
+        overflow: hidden !important;
+        height: 100vh !important;
+    }
+    
+   
 
     /* ===== Sidebar ===== */
     section[data-testid="stSidebar"] {
@@ -93,8 +132,9 @@ st.markdown("""
     /* ===== Hero Title ===== */
     .hero-container {
         text-align: center;
-        padding: 2.5rem 1rem 1rem 1rem;
-        margin-bottom: 0.5rem;
+        padding: 2rem 2.5rem 1.5rem 2.5rem;
+        margin: 0;
+        border-bottom: 1px solid var(--border-subtle);
     }
     .hero-title {
         font-size: 2.4rem;
@@ -199,31 +239,37 @@ st.markdown("""
     /* (empty state cards removed — clean main area) */
 
     /* ===== Chat Messages ===== */
-    .stChatMessage {
-        border-radius: var(--radius-md) !important;
-        border: 1px solid var(--border-subtle) !important;
-        margin-bottom: 1rem !important;
-        padding: 1rem 1.2rem !important;
-        background: var(--bg-glass) !important;
-        backdrop-filter: blur(6px) !important;
-        transition: var(--transition-fast);
-    }
+
+.stChatMessage {
+    border-radius: var(--radius-md) !important;
+    border: 1px solid var(--border-subtle) !important;
+    margin-bottom: 1rem !important;
+    padding: 1rem 1.2rem !important;
+    background: var(--bg-glass) !important;
+    backdrop-filter: blur(6px) !important;
+}
     .stChatMessage:hover {
         border-color: var(--border-accent) !important;
     }
 
-    /* ===== Chat Input ===== */
-    .stChatInput > div {
-        border-radius: var(--radius-md) !important;
-        border: 1px solid var(--border-subtle) !important;
-        background: var(--bg-glass) !important;
-        backdrop-filter: blur(6px) !important;
-        transition: var(--transition-smooth);
-    }
-    .stChatInput > div:focus-within {
-        border-color: var(--accent-indigo) !important;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12) !important;
-    }
+    
+
+   /* Chat input */
+.stChatInput {
+    flex-shrink: 0 !important;
+    margin-top: 0.7rem !important;
+}
+
+.stChatInput > div {
+    border-radius: var(--radius-md) !important;
+    border: 1px solid var(--border-subtle) !important;
+    background: var(--bg-glass) !important;
+}
+
+.stChatInput > div:focus-within {
+    border-color: var(--accent-indigo) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12) !important;
+}
 
     /* ===== Disabled/Locked Chat Input Overlay ===== */
     .chat-locked-wrapper {
@@ -395,6 +441,42 @@ st.markdown("""
         letter-spacing: 0.06em;
         margin-bottom: 0.4rem;
     }
+
+    /* ===== Draggable Split Resizer (Overleaf-style) ===== */
+    .docmind-resizer {
+        flex: 0 0 6px;
+        width: 6px;
+        min-width: 6px;
+        cursor: col-resize;
+        background: rgba(139, 92, 246, 0.35);
+        border-radius: 3px;
+        align-self: stretch;
+        margin: 0 4px;
+        position: relative;
+        transition: background var(--transition-fast), box-shadow var(--transition-fast);
+        z-index: 5;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04);
+    }
+    .docmind-resizer:hover,
+    .docmind-resizer.docmind-resizing {
+        background: var(--accent-indigo);
+        box-shadow: var(--shadow-glow);
+    }
+    .docmind-resizer::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 3px;
+        height: 40px;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, 0.55);
+    }
+    .docmind-resizer:hover::after,
+    .docmind-resizer.docmind-resizing::after {
+        background: rgba(255, 255, 255, 0.9);
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -422,6 +504,9 @@ if "document_name" not in st.session_state:
 
 if "chunk_count" not in st.session_state:
     st.session_state.chunk_count = 0
+
+if "document_bytes" not in st.session_state:
+    st.session_state.document_bytes = None
 
 
 # ---------------------------------------------
@@ -459,14 +544,16 @@ with st.sidebar:
         if process_button:
             with st.spinner("Analyzing and indexing document..."):
                 try:
+                    file_bytes = uploaded_file.getvalue()
                     number_of_chunks = pipeline.ingest_document(
-                        uploaded_file.getvalue(),
+                        file_bytes,
                         uploaded_file.name
                     )
 
                     st.session_state.document_processed = True
                     st.session_state.document_name = uploaded_file.name
                     st.session_state.chunk_count = number_of_chunks
+                    st.session_state.document_bytes = file_bytes  # Store file bytes for PDF viewer
                     st.session_state.messages = []  # Reset chat on new file upload
 
                     st.success("✅ Document indexed successfully!")
@@ -532,68 +619,311 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# Render Existing Chat History (only when document is active)
+# Two-Column Layout: Document Viewer (Left) + Chat (Right)
 if st.session_state.document_processed:
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+    col_doc, col_chat = st.columns([0.45, 0.55], gap="medium")
 
-            # Render retrieved context chunks for assistant messages
-            if message["role"] == "assistant" and "chunks" in message:
-                chunks = message.get("chunks", [])
-                if chunks:
-                    with st.expander("🔍 View Retrieved Context", expanded=False):
-                        for i, chunk in enumerate(chunks, start=1):
-                            st.markdown(
-                                f'<div class="chunk-card"><div class="chunk-label">Source Chunk {i}</div>{chunk}</div>',
-                                unsafe_allow_html=True
-                            )
+    # ===== LEFT COLUMN: DOCUMENT VIEWER =====
+    with col_doc:
+        st.markdown("""
+            <div id="docmind-viewer-marker"></div>
+            <div style="margin-bottom: 1rem;">
+                <h3 style="
+                    font-size: 1.1rem;
+                    margin: 0;
+                    color: var(--text-primary);
+                ">
+                    📄 Document Viewer
+                </h3>
+            </div>
+        """, unsafe_allow_html=True)
 
-# ---------------------------------------------
-# Chat Input — Always visible, locked when no doc
-# ---------------------------------------------
-if st.session_state.document_processed:
-    # Active chat input
-    if question := st.chat_input("Ask a question about your document..."):
-        st.session_state.messages.append({"role": "user", "content": question})
-        with st.chat_message("user"):
-            st.markdown(question)
+        try:
+            if st.session_state.document_bytes:
+                import base64
 
-        with st.chat_message("assistant"):
-            with st.spinner("Searching document context..."):
-                try:
+                pdf_base64 = base64.b64encode(
+                    st.session_state.document_bytes
+                ).decode("utf-8")
+
+                pdf_display = f"""
+                    <iframe
+                        src="data:application/pdf;base64,{pdf_base64}"
+                        width="100%"
+                        height="650"
+                        type="application/pdf"
+                        style="
+                            border-radius: 8px;
+                            border: 1px solid var(--border-subtle);
+                        ">
+                    </iframe>
+                """
+
+                st.markdown(
+                    pdf_display,
+                    unsafe_allow_html=True
+                )
+
+        except Exception as e:
+            st.warning(f"Could not display PDF: {str(e)}")
+
+            try:
+                full_content = pipeline.get_full_document_content()
+
+                if full_content:
+                    document_container = st.container(
+                        height=600,
+                        border=False
+                    )
+
+                    with document_container:
+                        st.text(full_content)
+
+            except Exception:
+                st.error("Document preview not available")
+
+    # ===== RIGHT COLUMN: CHAT INTERFACE =====
+    with col_chat:
+        st.markdown("""
+            <div style="margin-bottom: 1rem;">
+                <h3 style="
+                    font-size: 1.1rem;
+                    margin: 0;
+                    color: var(--text-primary);
+                ">
+                    💬 Chat
+                </h3>
+            </div>
+        """, unsafe_allow_html=True)
+
+        # Scrollable message area.
+        # The chat input is outside this container so it stays at the bottom.
+        chat_container = st.container(
+            height=555,
+            border=False
+        )
+
+        with chat_container:
+            if not st.session_state.messages:
+                st.markdown(
+                    """
+                    <div style="
+                        min-height: 420px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        text-align: center;
+                        color: var(--text-muted);
+                        font-size: 0.9rem;
+                    ">
+                        Ask something about your document to begin.
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+            for message in st.session_state.messages:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
+
+                    if (
+                        message["role"] == "assistant"
+                        and "chunks" in message
+                    ):
+                        chunks = message.get("chunks", [])
+
+                        if chunks:
+                            with st.expander(
+                                "🔍 View Retrieved Context",
+                                expanded=False
+                            ):
+                                for i, chunk in enumerate(
+                                    chunks,
+                                    start=1
+                                ):
+                                    st.markdown(
+                                        f"""
+                                        <div class="chunk-card">
+                                            <div class="chunk-label">
+                                                Source Chunk {i}
+                                            </div>
+                                            {chunk}
+                                        </div>
+                                        """,
+                                        unsafe_allow_html=True
+                                    )
+
+        # Chat input stays below the independently scrollable chat history.
+        question = st.chat_input(
+            "Ask a question about your document...",
+            key="document_chat_input"
+        )
+
+        if question:
+            st.session_state.messages.append({
+                "role": "user",
+                "content": question
+            })
+
+            try:
+                with st.spinner("Searching document context..."):
                     answer, chunks = pipeline.answer_question(question)
 
-                    st.markdown(answer)
+                st.session_state.messages.append({
+                    "role": "assistant",
+                    "content": answer,
+                    "chunks": chunks
+                })
 
-                    if chunks:
-                        with st.expander("🔍 View Retrieved Context", expanded=False):
-                            for i, chunk in enumerate(chunks, start=1):
-                                st.markdown(
-                                    f'<div class="chunk-card"><div class="chunk-label">Source Chunk {i}</div>{chunk}</div>',
-                                    unsafe_allow_html=True
-                                )
+            except Exception as error:
+                error_message = (
+                    "An error occurred while generating "
+                    f"the response: {error}"
+                )
 
-                    st.session_state.messages.append({
-                        "role": "assistant",
-                        "content": answer,
-                        "chunks": chunks
-                    })
+                st.session_state.messages.append({
+                    "role": "assistant",
+                    "content": error_message,
+                    "chunks": []
+                })
 
-                except Exception as error:
-                    error_message = f"An error occurred while generating the response: {error}"
-                    st.error(error_message)
-                    st.session_state.messages.append({
-                        "role": "assistant",
-                        "content": error_message,
-                        "chunks": []
-                    })
+            st.rerun()
+
+    # ---------------------------------------------
+    # Draggable resizer between the two main columns
+    # (Overleaf-style code/preview split)
+    # ---------------------------------------------
+    components.html(
+        """
+        <script>
+        (function() {
+            const doc = window.parent.document;
+            const RESIZER_WIDTH = 6;
+            const MIN_PCT = 20;
+            const MAX_PCT = 80;
+
+            function applySplit(leftCol, rightCol, containerWidth, leftPct) {
+                const rightPct = 100 - leftPct;
+                leftCol.style.flex = `0 0 ${leftPct}%`;
+                leftCol.style.width = `${leftPct}%`;
+                leftCol.style.maxWidth = 'none';
+                rightCol.style.flex = `0 0 ${rightPct}%`;
+                rightCol.style.width = `${rightPct}%`;
+                rightCol.style.maxWidth = 'none';
+            }
+
+            function init() {
+                const marker = doc.getElementById('docmind-viewer-marker');
+                if (!marker) { setTimeout(init, 200); return; }
+
+                const leftCol = marker.closest('[data-testid="stColumn"]');
+                if (!leftCol) { setTimeout(init, 200); return; }
+
+                const horizontalBlock = leftCol.parentElement;
+                if (!horizontalBlock) { setTimeout(init, 200); return; }
+
+                const columns = horizontalBlock.querySelectorAll(':scope > [data-testid="stColumn"]');
+                if (columns.length < 2) { setTimeout(init, 200); return; }
+
+                const rightCol = columns[1];
+
+                horizontalBlock.style.position = 'relative';
+                horizontalBlock.style.flexWrap = 'nowrap';
+                horizontalBlock.style.alignItems = 'stretch';
+
+                // Streamlit rebuilds these columns from scratch on every
+                // rerun, so re-apply whatever split the user last dragged to.
+                if (typeof window.__docmindSplitPct === 'number') {
+                    applySplit(leftCol, rightCol, horizontalBlock.getBoundingClientRect().width, window.__docmindSplitPct);
+                }
+
+                if (horizontalBlock.querySelector('.docmind-resizer')) { return; }
+
+                const resizer = doc.createElement('div');
+                resizer.className = 'docmind-resizer';
+                resizer.title = 'Drag to resize · double-click to reset';
+                horizontalBlock.insertBefore(resizer, rightCol);
+
+                let dragging = false;
+                let startX = 0, startLeftPct = 0, containerWidth = 0;
+
+                function onMouseDown(e) {
+                    dragging = true;
+                    startX = e.clientX;
+                    containerWidth = horizontalBlock.getBoundingClientRect().width;
+                    startLeftPct = (leftCol.getBoundingClientRect().width / containerWidth) * 100;
+                    resizer.classList.add('docmind-resizing');
+                    doc.body.style.userSelect = 'none';
+                    doc.body.style.cursor = 'col-resize';
+                    e.preventDefault();
+                }
+
+                function onMouseMove(e) {
+                    if (!dragging) return;
+                    const dxPct = ((e.clientX - startX) / containerWidth) * 100;
+                    let leftPct = startLeftPct + dxPct;
+                    leftPct = Math.min(MAX_PCT, Math.max(MIN_PCT, leftPct));
+                    window.__docmindSplitPct = leftPct;
+                    applySplit(leftCol, rightCol, containerWidth, leftPct);
+                }
+
+                function onMouseUp() {
+                    if (!dragging) return;
+                    dragging = false;
+                    resizer.classList.remove('docmind-resizing');
+                    doc.body.style.userSelect = '';
+                    doc.body.style.cursor = '';
+                }
+
+                function onDoubleClick() {
+                    window.__docmindSplitPct = 45;
+                    applySplit(leftCol, rightCol, horizontalBlock.getBoundingClientRect().width, 45);
+                }
+
+                resizer.addEventListener('mousedown', onMouseDown);
+                resizer.addEventListener('dblclick', onDoubleClick);
+
+                // Clean up listeners from any previous rerun before adding new ones.
+                if (window.__docmindCleanup) { window.__docmindCleanup(); }
+                doc.addEventListener('mousemove', onMouseMove);
+                doc.addEventListener('mouseup', onMouseUp);
+                window.__docmindCleanup = function() {
+                    doc.removeEventListener('mousemove', onMouseMove);
+                    doc.removeEventListener('mouseup', onMouseUp);
+                };
+            }
+
+            init();
+        })();
+        </script>
+        """,
+        height=0,
+        width=0,
+    )
+
 else:
-    # Locked / faded chat input with hint
     st.markdown(
-        '<div class="chat-locked-hint"><span class="lock-icon"></span> Upload a document from the sidebar to start chatting</div>',
+        """
+        <div class="chat-locked-hint">
+            <span class="lock-icon">🔒</span>
+            Upload and process a document from the sidebar to start chatting.
+        </div>
+        """,
         unsafe_allow_html=True
     )
-    st.markdown('<div class="chat-locked-wrapper">', unsafe_allow_html=True)
-    st.chat_input("Ask a question about your document...", disabled=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown(
+        '<div class="chat-locked-wrapper">',
+        unsafe_allow_html=True
+    )
+
+    st.chat_input(
+        "Ask a question about your document...",
+        disabled=True,
+        key="locked_chat_input"
+    )
+
+    st.markdown(
+        "</div>",
+        unsafe_allow_html=True
+    )
