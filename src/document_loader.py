@@ -4,12 +4,10 @@ import fitz
 def load_pdf(file_bytes: bytes) -> list[tuple[int, str]]:
     """
     Extract text from a PDF file and keep the page number for each page.
-
     Parameters
     ----------
     file_bytes : bytes
         PDF file contents.
-
     Returns
     -------
     list[tuple[int, str]]
@@ -34,7 +32,11 @@ def load_text(file_bytes: bytes) -> list[tuple[int, str]]:
     Decode a plain text file as page 1.
     """
 
-    text = file_bytes.decode("utf-8", errors="ignore")
+    try:
+        text = file_bytes.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        text = file_bytes.decode("latin-1", errors="ignore")
+
     if not text.strip():
         return []
     return [(1, text)]

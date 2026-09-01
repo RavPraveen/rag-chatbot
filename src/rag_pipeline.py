@@ -16,7 +16,7 @@ class RAGPipeline:
         )
 
         self.llm = LLM()
-        
+
         self.document_content = None  # Store document content for preview
 
     def ingest_document(
@@ -45,9 +45,12 @@ class RAGPipeline:
         self.vector_store.clear()
 
         self.vector_store.add_documents(chunks)
-        
+
         # Store document content for preview
-        self.document_content = "".join([page[1] for page in pages] if isinstance(pages[0], tuple) else pages)
+        if pages and isinstance(pages[0], tuple):
+            self.document_content = "".join(page_text for _, page_text in pages)
+        else:
+            self.document_content = "".join(pages) if isinstance(pages, list) else str(pages)
 
         return len(chunks), pages
 

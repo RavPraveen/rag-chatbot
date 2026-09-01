@@ -5,15 +5,12 @@ def split_text(
 ) -> list[str]:
     """
     Split text into overlapping chunks and prefix each chunk with its page number.
-
     Parameters
     ----------
     text : str | list[tuple[int, str]]
         Input document text or a list of (page_number, page_text) pairs.
-
     chunk_size : int
         Maximum approximate number of characters per chunk.
-
     chunk_overlap : int
         Number of overlapping characters between chunks.
     """

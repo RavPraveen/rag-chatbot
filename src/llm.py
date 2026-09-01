@@ -28,23 +28,14 @@ class LLM:
 
         prompt = f"""
 You are a document question-answering assistant.
-
 Answer the user's question using ONLY the provided document context.
-
 If the answer cannot be found in the context, say:
-
 "I couldn't find the answer in the uploaded document."
-
 Do not invent information.
-
 When you reference a fact from the document, include the page number from the chunk label in your answer, such as "Page 4".
-
 Document context:
-
 {context_text}
-
 Question:
-
 {question}
 """
 

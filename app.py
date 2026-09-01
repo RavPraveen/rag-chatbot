@@ -10,7 +10,7 @@ load_dotenv()
 # Page Configuration
 # ---------------------------------------------
 st.set_page_config(
-    page_title="DocuMind — AI Document Assistant",
+    page_title="DocuBot — AI Document Assistant",
     page_icon="",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -23,7 +23,6 @@ st.markdown("""
 <style>
     /* ===== Google Fonts ===== */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
     /* ===== Root Variables ===== */
     :root {
         --bg-primary: #0f1117;
@@ -54,13 +53,11 @@ st.markdown("""
         --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
     /* ===== Global Reset ===== */
     html, body, [class*="css"] {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
         color: var(--text-primary);
     }
-
     /* ===== Main Container ===== */
     .main {
         overflow: hidden !important;
@@ -85,18 +82,15 @@ st.markdown("""
         overflow: hidden;
         padding: 1.5rem 2.5rem !important;
     }
-
     /* Keep the columns fixed. The document viewer and chat area
        manage their own scrolling independently. */
     [data-testid="stColumn"] {
         overflow: hidden !important;
     }
-
     /* Fixed-height Streamlit containers can scroll internally. */
     [data-testid="stVerticalBlockBorderWrapper"] {
         min-height: 0;
     }
-
     /* ===== Scrollbar ===== */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -110,7 +104,6 @@ st.markdown("""
     }
     
    
-
     /* ===== Sidebar ===== */
     section[data-testid="stSidebar"] {
         background: var(--bg-secondary) !important;
@@ -128,7 +121,6 @@ st.markdown("""
     section[data-testid="stSidebar"] > div {
         padding-top: 1.5rem;
     }
-
     /* ===== Hero Title ===== */
     .hero-container {
         text-align: center;
@@ -155,7 +147,6 @@ st.markdown("""
         margin: 0 auto;
         line-height: 1.6;
     }
-
     /* ===== Sidebar Branding ===== */
     .sidebar-brand {
         display: flex;
@@ -184,7 +175,6 @@ st.markdown("""
         letter-spacing: 0.04em;
         text-transform: uppercase;
     }
-
     /* ===== Status Card ===== */
     .status-card {
         background: var(--gradient-card);
@@ -213,7 +203,6 @@ st.markdown("""
         color: var(--text-primary);
         word-break: break-all;
     }
-
     /* ===== Badges ===== */
     .badge {
         padding: 5px 14px;
@@ -235,11 +224,8 @@ st.markdown("""
         color: #fb7185;
         border: 1px solid rgba(244, 63, 94, 0.15);
     }
-
     /* (empty state cards removed — clean main area) */
-
     /* ===== Chat Messages ===== */
-
 .stChatMessage {
     border-radius: var(--radius-md) !important;
     border: 1px solid var(--border-subtle) !important;
@@ -251,26 +237,21 @@ st.markdown("""
     .stChatMessage:hover {
         border-color: var(--border-accent) !important;
     }
-
     
-
    /* Chat input */
 .stChatInput {
     flex-shrink: 0 !important;
     margin-top: 0.7rem !important;
 }
-
 .stChatInput > div {
     border-radius: var(--radius-md) !important;
     border: 1px solid var(--border-subtle) !important;
     background: var(--bg-glass) !important;
 }
-
 .stChatInput > div:focus-within {
     border-color: var(--accent-indigo) !important;
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12) !important;
 }
-
     /* ===== Disabled/Locked Chat Input Overlay ===== */
     .chat-locked-wrapper {
         position: relative;
@@ -294,7 +275,6 @@ st.markdown("""
         font-size: 0.9rem;
         opacity: 0.7;
     }
-
     /* ===== Buttons ===== */
     .stButton > button {
         border-radius: var(--radius-sm) !important;
@@ -328,7 +308,6 @@ st.markdown("""
         color: var(--text-primary) !important;
         background: rgba(99,102,241,0.06) !important;
     }
-
     /* ===== File Uploader ===== */
     section[data-testid="stFileUploader"] {
         border-radius: var(--radius-md) !important;
@@ -346,7 +325,6 @@ st.markdown("""
         border-color: rgba(99, 102, 241, 0.45) !important;
         background: rgba(99, 102, 241, 0.04) !important;
     }
-
     /* ===== Expander (Context Viewer) ===== */
     .streamlit-expanderHeader {
         font-weight: 500 !important;
@@ -358,19 +336,16 @@ st.markdown("""
     .streamlit-expanderContent {
         border-color: var(--border-subtle) !important;
     }
-
     /* ===== Dividers ===== */
     hr {
         border-color: var(--border-subtle) !important;
         opacity: 0.5;
     }
-
     /* ===== Info/Success/Error Alerts ===== */
     .stAlert {
         border-radius: var(--radius-sm) !important;
         font-size: 0.9rem !important;
     }
-
     /* ===== Sidebar Section Headers ===== */
     .sidebar-section-header {
         font-size: 0.72rem;
@@ -380,7 +355,6 @@ st.markdown("""
         letter-spacing: 0.1em;
         margin: 1.2rem 0 0.5rem 0;
     }
-
     /* ===== Metric Pill ===== */
     .metric-row {
         display: flex;
@@ -404,7 +378,6 @@ st.markdown("""
         color: var(--text-primary);
         font-family: 'JetBrains Mono', 'Fira Code', monospace;
     }
-
     /* ===== Pulse animation for active indicator ===== */
     .pulse-dot {
         display: inline-block;
@@ -420,7 +393,6 @@ st.markdown("""
         0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
         50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
     }
-
     /* ===== Chunk source card styling ===== */
     .chunk-card {
         background: var(--bg-glass);
@@ -441,7 +413,6 @@ st.markdown("""
         letter-spacing: 0.06em;
         margin-bottom: 0.4rem;
     }
-
     /* ===== Draggable Split Resizer (Overleaf-style) ===== */
     .docmind-resizer {
         flex: 0 0 6px;
@@ -508,6 +479,9 @@ if "chunk_count" not in st.session_state:
 if "document_bytes" not in st.session_state:
     st.session_state.document_bytes = None
 
+if "document_type" not in st.session_state:
+    st.session_state.document_type = None
+
 
 # ---------------------------------------------
 # Sidebar Interface
@@ -518,14 +492,14 @@ with st.sidebar:
         <div class="sidebar-brand">
             <span class="sidebar-brand-icon"></span>
             <div>
-                <div class="sidebar-brand-text">DocuMind</div>
+                <div class="sidebar-brand-text">DocuBot</div>
                 <div class="sidebar-brand-sub">AI Document Assistant</div>
             </div>
         </div>
     """, unsafe_allow_html=True)
 
     # Upload Section
-    st.markdown('<div class="sidebar-section-header">📁 Document Upload</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-section-header"> Document Upload</div>', unsafe_allow_html=True)
 
     uploaded_file = st.file_uploader(
         "Upload Source File",
@@ -536,7 +510,7 @@ with st.sidebar:
 
     if uploaded_file:
         process_button = st.button(
-            "⚡ Process & Index Document",
+            "Upload",
             use_container_width=True,
             type="primary"
         )
@@ -552,11 +526,12 @@ with st.sidebar:
 
                     st.session_state.document_processed = True
                     st.session_state.document_name = uploaded_file.name
+                    st.session_state.document_type = uploaded_file.name.lower().rsplit(".", 1)[-1] if "." in uploaded_file.name else ""
                     st.session_state.chunk_count = number_of_chunks
-                    st.session_state.document_bytes = file_bytes  # Store file bytes for PDF viewer
+                    st.session_state.document_bytes = file_bytes
                     st.session_state.messages = []  # Reset chat on new file upload
 
-                    st.success("✅ Document indexed successfully!")
+
 
                 except Exception as error:
                     st.error(f"Failed to process document: {error}")
@@ -564,13 +539,13 @@ with st.sidebar:
     st.divider()
 
 
-   
+
 
     # Document Status
     st.markdown('<div class="sidebar-section-header"> Document Status</div>', unsafe_allow_html=True)
 
     if st.session_state.document_processed:
-       
+
 
         st.markdown(f""" 
         <div class="status-card"> 
@@ -579,11 +554,10 @@ with st.sidebar:
             <span class="metric-label">File</span> 
             <span class="metric-value">{st.session_state.document_name}</span> 
         </div> 
-
          </div> 
         """, unsafe_allow_html=True)
 
-        if st.button("🗑️ Clear Chat History", use_container_width=True):
+        if st.button(" Clear Chat History", use_container_width=True):
             st.session_state.messages = []
             st.rerun()
     else:
@@ -633,39 +607,62 @@ if st.session_state.document_processed:
                     margin: 0;
                     color: var(--text-primary);
                 ">
-                    📄 Document Viewer
+                     Document Viewer
                 </h3>
             </div>
         """, unsafe_allow_html=True)
 
         try:
             if st.session_state.document_bytes:
-                import base64
+                document_type = (st.session_state.document_type or "").lower()
 
-                pdf_base64 = base64.b64encode(
-                    st.session_state.document_bytes
-                ).decode("utf-8")
+                if document_type == "pdf":
+                    import base64
 
-                pdf_display = f"""
-                    <iframe
-                        src="data:application/pdf;base64,{pdf_base64}"
-                        width="100%"
-                        height="650"
-                        type="application/pdf"
-                        style="
-                            border-radius: 8px;
-                            border: 1px solid var(--border-subtle);
-                        ">
-                    </iframe>
-                """
+                    pdf_base64 = base64.b64encode(
+                        st.session_state.document_bytes
+                    ).decode("utf-8")
 
-                st.markdown(
-                    pdf_display,
-                    unsafe_allow_html=True
-                )
+                    pdf_display = f"""
+                        <iframe
+                            src="data:application/pdf;base64,{pdf_base64}"
+                            width="100%"
+                            height="650"
+                            type="application/pdf"
+                            style="
+                                border-radius: 8px;
+                                border: 1px solid var(--border-subtle);
+                            ">
+                        </iframe>
+                    """
+
+                    st.markdown(
+                        pdf_display,
+                        unsafe_allow_html=True
+                    )
+
+                else:
+                    preview_text = pipeline.get_full_document_content()
+
+                    if not preview_text and st.session_state.document_bytes is not None:
+                        try:
+                            preview_text = st.session_state.document_bytes.decode("utf-8-sig")
+                        except UnicodeDecodeError:
+                            preview_text = st.session_state.document_bytes.decode("latin-1", errors="replace")
+
+                    if not preview_text:
+                        preview_text = "No text content was found in this file."
+
+                    document_container = st.container(
+                        height=650,
+                        border=False
+                    )
+
+                    with document_container:
+                        st.code(preview_text, language="text")
 
         except Exception as e:
-            st.warning(f"Could not display PDF: {str(e)}")
+            st.warning(f"Could not display document preview: {str(e)}")
 
             try:
                 full_content = pipeline.get_full_document_content()
@@ -691,7 +688,7 @@ if st.session_state.document_processed:
                     margin: 0;
                     color: var(--text-primary);
                 ">
-                    💬 Chat
+                     Chat
                 </h3>
             </div>
         """, unsafe_allow_html=True)
@@ -801,7 +798,6 @@ if st.session_state.document_processed:
             const RESIZER_WIDTH = 6;
             const MIN_PCT = 20;
             const MAX_PCT = 80;
-
             function applySplit(leftCol, rightCol, containerWidth, leftPct) {
                 const rightPct = 100 - leftPct;
                 leftCol.style.flex = `0 0 ${leftPct}%`;
@@ -811,42 +807,31 @@ if st.session_state.document_processed:
                 rightCol.style.width = `${rightPct}%`;
                 rightCol.style.maxWidth = 'none';
             }
-
             function init() {
                 const marker = doc.getElementById('docmind-viewer-marker');
                 if (!marker) { setTimeout(init, 200); return; }
-
                 const leftCol = marker.closest('[data-testid="stColumn"]');
                 if (!leftCol) { setTimeout(init, 200); return; }
-
                 const horizontalBlock = leftCol.parentElement;
                 if (!horizontalBlock) { setTimeout(init, 200); return; }
-
                 const columns = horizontalBlock.querySelectorAll(':scope > [data-testid="stColumn"]');
                 if (columns.length < 2) { setTimeout(init, 200); return; }
-
                 const rightCol = columns[1];
-
                 horizontalBlock.style.position = 'relative';
                 horizontalBlock.style.flexWrap = 'nowrap';
                 horizontalBlock.style.alignItems = 'stretch';
-
                 // Streamlit rebuilds these columns from scratch on every
                 // rerun, so re-apply whatever split the user last dragged to.
                 if (typeof window.__docmindSplitPct === 'number') {
                     applySplit(leftCol, rightCol, horizontalBlock.getBoundingClientRect().width, window.__docmindSplitPct);
                 }
-
                 if (horizontalBlock.querySelector('.docmind-resizer')) { return; }
-
                 const resizer = doc.createElement('div');
                 resizer.className = 'docmind-resizer';
                 resizer.title = 'Drag to resize · double-click to reset';
                 horizontalBlock.insertBefore(resizer, rightCol);
-
                 let dragging = false;
                 let startX = 0, startLeftPct = 0, containerWidth = 0;
-
                 function onMouseDown(e) {
                     dragging = true;
                     startX = e.clientX;
@@ -857,7 +842,6 @@ if st.session_state.document_processed:
                     doc.body.style.cursor = 'col-resize';
                     e.preventDefault();
                 }
-
                 function onMouseMove(e) {
                     if (!dragging) return;
                     const dxPct = ((e.clientX - startX) / containerWidth) * 100;
@@ -866,7 +850,6 @@ if st.session_state.document_processed:
                     window.__docmindSplitPct = leftPct;
                     applySplit(leftCol, rightCol, containerWidth, leftPct);
                 }
-
                 function onMouseUp() {
                     if (!dragging) return;
                     dragging = false;
@@ -874,15 +857,12 @@ if st.session_state.document_processed:
                     doc.body.style.userSelect = '';
                     doc.body.style.cursor = '';
                 }
-
                 function onDoubleClick() {
                     window.__docmindSplitPct = 45;
                     applySplit(leftCol, rightCol, horizontalBlock.getBoundingClientRect().width, 45);
                 }
-
                 resizer.addEventListener('mousedown', onMouseDown);
                 resizer.addEventListener('dblclick', onDoubleClick);
-
                 // Clean up listeners from any previous rerun before adding new ones.
                 if (window.__docmindCleanup) { window.__docmindCleanup(); }
                 doc.addEventListener('mousemove', onMouseMove);
@@ -892,7 +872,6 @@ if st.session_state.document_processed:
                     doc.removeEventListener('mouseup', onMouseUp);
                 };
             }
-
             init();
         })();
         </script>
@@ -905,7 +884,7 @@ else:
     st.markdown(
         """
         <div class="chat-locked-hint">
-            <span class="lock-icon">🔒</span>
+            <span class="lock-icon"></span>
             Upload and process a document from the sidebar to start chatting.
         </div>
         """,
