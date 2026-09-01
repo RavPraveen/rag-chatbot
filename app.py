@@ -536,7 +536,7 @@ with st.sidebar:
 
     if uploaded_file:
         process_button = st.button(
-            "⚡ Process & Index Document",
+            "Upload",
             use_container_width=True,
             type="primary"
         )
@@ -556,7 +556,7 @@ with st.sidebar:
                     st.session_state.document_bytes = file_bytes  # Store file bytes for PDF viewer
                     st.session_state.messages = []  # Reset chat on new file upload
 
-                    st.success("✅ Document indexed successfully!")
+                   
 
                 except Exception as error:
                     st.error(f"Failed to process document: {error}")
@@ -583,7 +583,7 @@ with st.sidebar:
          </div> 
         """, unsafe_allow_html=True)
 
-        if st.button("🗑️ Clear Chat History", use_container_width=True):
+        if st.button(" Clear Chat History", use_container_width=True):
             st.session_state.messages = []
             st.rerun()
     else:
@@ -633,7 +633,7 @@ if st.session_state.document_processed:
                     margin: 0;
                     color: var(--text-primary);
                 ">
-                    📄 Document Viewer
+                     Document Viewer
                 </h3>
             </div>
         """, unsafe_allow_html=True)
@@ -691,7 +691,7 @@ if st.session_state.document_processed:
                     margin: 0;
                     color: var(--text-primary);
                 ">
-                    💬 Chat
+                     Chat
                 </h3>
             </div>
         """, unsafe_allow_html=True)
@@ -905,7 +905,7 @@ else:
     st.markdown(
         """
         <div class="chat-locked-hint">
-            <span class="lock-icon">🔒</span>
+            <span class="lock-icon"></span>
             Upload and process a document from the sidebar to start chatting.
         </div>
         """,
