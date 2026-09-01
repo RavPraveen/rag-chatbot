@@ -16,6 +16,8 @@ class RAGPipeline:
         )
 
         self.llm = LLM()
+        
+        self.document_content = None  # Store document content for preview
 
     def ingest_document(
         self,
@@ -43,8 +45,21 @@ class RAGPipeline:
         self.vector_store.clear()
 
         self.vector_store.add_documents(chunks)
+        
+        # Store document content for preview
+        self.document_content = "".join([page[1] for page in pages] if isinstance(pages[0], tuple) else pages)
 
         return len(chunks), pages
+
+    def get_document_preview(self, max_chars: int = 1500) -> str:
+        """Get a preview of the uploaded document content."""
+        if self.document_content:
+            return self.document_content[:max_chars]
+        return None
+
+    def get_full_document_content(self) -> str:
+        """Get the complete document content."""
+        return self.document_content
 
     def answer_question(
         self,
