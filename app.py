@@ -10,7 +10,7 @@ load_dotenv()
 # ---------------------------------------------
 st.set_page_config(
     page_title="DocuMind — AI Document Assistant",
-    page_icon="🧠",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -196,79 +196,7 @@ st.markdown("""
         border: 1px solid rgba(244, 63, 94, 0.15);
     }
 
-    /* ===== Feature Cards (Empty State) ===== */
-    .feature-card {
-        background: var(--bg-glass);
-        border: 1px solid var(--border-subtle);
-        border-radius: var(--radius-lg);
-        padding: 2rem 1.5rem;
-        text-align: center;
-        transition: all var(--transition-smooth);
-        height: 100%;
-        position: relative;
-        overflow: hidden;
-    }
-    .feature-card::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 3px;
-        background: var(--gradient-primary);
-        opacity: 0;
-        transition: opacity var(--transition-smooth);
-    }
-    .feature-card:hover {
-        border-color: var(--border-accent);
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-md), var(--shadow-glow);
-    }
-    .feature-card:hover::before {
-        opacity: 1;
-    }
-    .feature-icon {
-        font-size: 2.2rem;
-        margin-bottom: 0.8rem;
-        display: block;
-    }
-    .feature-title {
-        font-size: 1rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 0.5rem;
-    }
-    .feature-desc {
-        font-size: 0.85rem;
-        color: var(--text-secondary);
-        line-height: 1.55;
-    }
-
-    /* ===== Empty State Banner ===== */
-    .empty-banner {
-        background: var(--gradient-card);
-        border: 1px dashed rgba(99, 102, 241, 0.25);
-        border-radius: var(--radius-lg);
-        padding: 2rem;
-        text-align: center;
-        margin: 1.5rem 0 2rem 0;
-    }
-    .empty-banner-icon {
-        font-size: 2.8rem;
-        margin-bottom: 0.6rem;
-        display: block;
-        animation: float 3s ease-in-out infinite;
-    }
-    @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-8px); }
-    }
-    .empty-banner-text {
-        font-size: 1rem;
-        color: var(--text-secondary);
-        font-weight: 400;
-    }
-    .empty-banner-text strong {
-        color: var(--accent-indigo);
-    }
+    /* (empty state cards removed — clean main area) */
 
     /* ===== Chat Messages ===== */
     .stChatMessage {
@@ -295,6 +223,30 @@ st.markdown("""
     .stChatInput > div:focus-within {
         border-color: var(--accent-indigo) !important;
         box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12) !important;
+    }
+
+    /* ===== Disabled/Locked Chat Input Overlay ===== */
+    .chat-locked-wrapper {
+        position: relative;
+    }
+    .chat-locked-wrapper .stChatInput > div {
+        opacity: 0.35 !important;
+        pointer-events: none !important;
+        filter: grayscale(0.5);
+    }
+    .chat-locked-hint {
+        text-align: center;
+        padding: 0.6rem 0 0.2rem 0;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    .chat-locked-hint .lock-icon {
+        font-size: 0.9rem;
+        opacity: 0.7;
     }
 
     /* ===== Buttons ===== */
@@ -479,7 +431,7 @@ with st.sidebar:
     # Branding
     st.markdown("""
         <div class="sidebar-brand">
-            <span class="sidebar-brand-icon">🧠</span>
+            <span class="sidebar-brand-icon"></span>
             <div>
                 <div class="sidebar-brand-text">DocuMind</div>
                 <div class="sidebar-brand-sub">AI Document Assistant</div>
@@ -524,33 +476,24 @@ with st.sidebar:
 
     st.divider()
 
+
+   
+
     # Document Status
-    st.markdown('<div class="sidebar-section-header">📊 Document Status</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-section-header"> Document Status</div>', unsafe_allow_html=True)
 
     if st.session_state.document_processed:
-        st.markdown(
-            '<span class="badge badge-active"><span class="pulse-dot"></span> Active</span>',
-            unsafe_allow_html=True
-        )
+       
 
-        st.markdown(f"""
-            <div class="status-card">
-                <div class="metric-row">
-                    <span class="metric-icon">📄</span>
-                    <span class="metric-label">File</span>
-                    <span class="metric-value">{st.session_state.document_name}</span>
-                </div>
-                <div class="metric-row">
-                    <span class="metric-icon">🧩</span>
-                    <span class="metric-label">Chunks</span>
-                    <span class="metric-value">{st.session_state.chunk_count}</span>
-                </div>
-                <div class="metric-row">
-                    <span class="metric-icon">💬</span>
-                    <span class="metric-label">Messages</span>
-                    <span class="metric-value">{len(st.session_state.messages)}</span>
-                </div>
-            </div>
+        st.markdown(f""" 
+        <div class="status-card"> 
+        <div class="metric-row"> 
+            <span class="metric-icon"></span> 
+            <span class="metric-label">File</span> 
+            <span class="metric-value">{st.session_state.document_name}</span> 
+        </div> 
+
+         </div> 
         """, unsafe_allow_html=True)
 
         if st.button("🗑️ Clear Chat History", use_container_width=True):
@@ -588,46 +531,9 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Empty State
-if not st.session_state.document_processed:
-    st.markdown("""
-        <div class="empty-banner">
-            <span class="empty-banner-icon">📂</span>
-            <div class="empty-banner-text">
-                Upload a <strong>PDF</strong> or <strong>TXT</strong> file from the sidebar to get started.
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
 
-    # Feature Highlights Grid
-    col1, col2, col3 = st.columns(3, gap="medium")
-    with col1:
-        st.markdown("""
-            <div class="feature-card">
-                <span class="feature-icon">📄</span>
-                <div class="feature-title">Multi-Format Support</div>
-                <div class="feature-desc">Upload text files or PDF documents seamlessly for instant indexing.</div>
-            </div>
-        """, unsafe_allow_html=True)
-    with col2:
-        st.markdown("""
-            <div class="feature-card">
-                <span class="feature-icon">🎯</span>
-                <div class="feature-title">Context-Aware Answers</div>
-                <div class="feature-desc">Responses are sourced directly from your uploaded content with RAG.</div>
-            </div>
-        """, unsafe_allow_html=True)
-    with col3:
-        st.markdown("""
-            <div class="feature-card">
-                <span class="feature-icon">🔍</span>
-                <div class="feature-title">Full Transparency</div>
-                <div class="feature-desc">Inspect the exact document chunks used for every generated response.</div>
-            </div>
-        """, unsafe_allow_html=True)
-
-else:
-    # Render Existing Chat History
+# Render Existing Chat History (only when document is active)
+if st.session_state.document_processed:
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
@@ -643,14 +549,16 @@ else:
                                 unsafe_allow_html=True
                             )
 
-    # Chat Input Handling
+# ---------------------------------------------
+# Chat Input — Always visible, locked when no doc
+# ---------------------------------------------
+if st.session_state.document_processed:
+    # Active chat input
     if question := st.chat_input("Ask a question about your document..."):
-        # Store & Display User Message
         st.session_state.messages.append({"role": "user", "content": question})
         with st.chat_message("user"):
             st.markdown(question)
 
-        # Generate & Display Assistant Response
         with st.chat_message("assistant"):
             with st.spinner("Searching document context..."):
                 try:
@@ -680,3 +588,12 @@ else:
                         "content": error_message,
                         "chunks": []
                     })
+else:
+    # Locked / faded chat input with hint
+    st.markdown(
+        '<div class="chat-locked-hint"><span class="lock-icon"></span> Upload a document from the sidebar to start chatting</div>',
+        unsafe_allow_html=True
+    )
+    st.markdown('<div class="chat-locked-wrapper">', unsafe_allow_html=True)
+    st.chat_input("Ask a question about your document...", disabled=True)
+    st.markdown('</div>', unsafe_allow_html=True)

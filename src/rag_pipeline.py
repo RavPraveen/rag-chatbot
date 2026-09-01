@@ -21,7 +21,7 @@ class RAGPipeline:
         self,
         file_bytes: bytes,
         filename: str
-    ) -> int:
+    ) -> tuple[int, list[tuple[int, str]]]:
 
         pages = load_document(
             file_bytes,
@@ -44,7 +44,7 @@ class RAGPipeline:
 
         self.vector_store.add_documents(chunks)
 
-        return len(chunks)
+        return len(chunks), pages
 
     def answer_question(
         self,
